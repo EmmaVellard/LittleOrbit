@@ -2,14 +2,16 @@ export type JournalEntry = {
   date: string;
   text: string;
   updatedAt: string;
+  favorite?: boolean;
 };
 
-const DATABASE_NAME = 'flowery-day';
+const DATABASE_NAME = 'little-orbit';
+const LEGACY_DATABASE_NAME = ['flowery', 'day'].join('-');
 const STORE_NAME = 'entries';
 
-function openDatabase(): Promise<IDBDatabase> {
+function openDatabase(databaseName = DATABASE_NAME): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DATABASE_NAME, 1);
+    const request = indexedDB.open(databaseName, 1);
     request.onupgradeneeded = () => {
       const database = request.result;
       if (!database.objectStoreNames.contains(STORE_NAME)) {
@@ -18,6 +20,22 @@ function openDatabase(): Promise<IDBDatabase> {
     };
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
+  });
+}
+
+async function readEntries(databaseName = DATABASE_NAME): Promise<JournalEntry[]> {
+  const database = await openDatabase(databaseName);
+  return new Promise((resolve, reject) => {
+    const request = database.transaction(STORE_NAME, 'readonly').objectStore(STORE_NAME).getAll();
+    request.onsuccess = () => {
+      const entries = request.result as JournalEntry[];
+      database.close();
+      resolve(entries);
+    };
+    request.onerror = () => {
+      database.close();
+      reject(request.error);
+    };
   });
 }
 
@@ -30,12 +48,14 @@ function transactionComplete(transaction: IDBTransaction) {
 }
 
 export async function getEntries(): Promise<JournalEntry[]> {
-  const database = await openDatabase();
-  return new Promise((resolve, reject) => {
-    const request = database.transaction(STORE_NAME, 'readonly').objectStore(STORE_NAME).getAll();
-    request.onsuccess = () => resolve(request.result as JournalEntry[]);
-    request.onerror = () => reject(request.error);
-  });
+  const entries = await readEntries();
+  if (entries.length) return entries;
+
+  const legacyEntries = await readEntries(LEGACY_DATABASE_NAME);
+  if (!legacyEntries.length) return [];
+  await putEntries(legacyEntries);
+  indexedDB.deleteDatabase(LEGACY_DATABASE_NAME);
+  return legacyEntries;
 }
 
 export async function putEntry(entry: JournalEntry) {
@@ -43,6 +63,7 @@ export async function putEntry(entry: JournalEntry) {
   const transaction = database.transaction(STORE_NAME, 'readwrite');
   transaction.objectStore(STORE_NAME).put(entry);
   await transactionComplete(transaction);
+  database.close();
 }
 
 export async function putEntries(entries: JournalEntry[]) {
@@ -51,6 +72,7 @@ export async function putEntries(entries: JournalEntry[]) {
   const store = transaction.objectStore(STORE_NAME);
   entries.forEach((entry) => store.put(entry));
   await transactionComplete(transaction);
+  database.close();
 }
 
 export async function deleteEntry(date: string) {
@@ -58,6 +80,7 @@ export async function deleteEntry(date: string) {
   const transaction = database.transaction(STORE_NAME, 'readwrite');
   transaction.objectStore(STORE_NAME).delete(date);
   await transactionComplete(transaction);
+  database.close();
 }
 
 export async function clearEntries() {
@@ -65,4 +88,5 @@ export async function clearEntries() {
   const transaction = database.transaction(STORE_NAME, 'readwrite');
   transaction.objectStore(STORE_NAME).clear();
   await transactionComplete(transaction);
+  database.close();
 }
