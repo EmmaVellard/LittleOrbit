@@ -24,6 +24,7 @@ type View = 'year' | 'memories' | 'more';
 type CalendarMode = 'year' | 'month';
 
 const DRAFT_PREFIX = 'little-orbit-draft:';
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 type DotDay = {
@@ -204,7 +205,7 @@ export default function JournalApp() {
 
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker
-        .register('/sw.js', { updateViaCache: 'none' })
+        .register(`${BASE_PATH}/sw.js`, { updateViaCache: 'none' })
         .then((registration) => registration.update())
         .catch(() => undefined);
     }

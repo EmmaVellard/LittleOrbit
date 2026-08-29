@@ -1,8 +1,8 @@
 # Little Orbit
 
-![Little Orbit — My year among the stars](docs/images/little-orbit-banner.png)
+![Little Orbit — My year among the stars](docs/images/little-orbit-banner.jpg)
 
-### [Open Little Orbit](https://little-orbit.emma-vellard.chatgpt.site)
+### [Open Little Orbit](https://emmavellard.github.io/LittleOrbit/)
 
 Little Orbit is a gentle daily journal for keeping one small memory at a time. A sentence is enough: something that made you smile, a quiet detail, a place, a person, or a moment you do not want to lose.
 
@@ -10,7 +10,10 @@ As the days pass, your year becomes a constellation of softly colored dots — a
 
 ## Watch your year take shape
 
-![A celestial year arranged in soft blue and mauve orbits](docs/images/year-in-orbit.png)
+<p align="center">
+  <img src="docs/images/app-year-screen.jpg" alt="Little Orbit year view" width="46%">
+  <img src="docs/images/app-memories-screen.jpg" alt="Little Orbit memories view" width="46%">
+</p>
 
 Every dot represents a day. Open today’s dot to write a memory, return to an earlier day, or switch between the full year and a closer monthly view. Filled days keep their own color, so the calendar slowly becomes unmistakably yours.
 
@@ -23,7 +26,7 @@ Every dot represents a day. Open today’s dot to write a memory, return to an e
 - Let unfinished thoughts wait safely as local drafts.
 - Download the whole journal as a readable Markdown keepsake.
 
-![An open journal surrounded by moons, planets, and stars](docs/images/memory-journal.png)
+![An open journal surrounded by moons, planets, and stars](docs/images/memory-journal.jpg)
 
 ## Your journal stays yours
 

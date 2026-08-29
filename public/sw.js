@@ -1,5 +1,13 @@
-const CACHE_NAME = 'little-orbit-v16';
-const APP_SHELL = ['/', '/manifest.webmanifest', '/icon-192.png', '/icon-512.png'];
+const CACHE_NAME = 'little-orbit-v17';
+const APP_BASE_URL = new URL('./', self.location.href);
+const scopedUrl = (path) => new URL(path, APP_BASE_URL).toString();
+const HOME_URL = scopedUrl('.');
+const APP_SHELL = [
+  HOME_URL,
+  scopedUrl('manifest.webmanifest'),
+  scopedUrl('icon-192.png'),
+  scopedUrl('icon-512.png'),
+];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)));
@@ -22,10 +30,10 @@ self.addEventListener('fetch', (event) => {
       fetch(request)
         .then((response) => {
           const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put('/', copy));
+          caches.open(CACHE_NAME).then((cache) => cache.put(HOME_URL, copy));
           return response;
         })
-        .catch(() => caches.match('/')),
+        .catch(() => caches.match(HOME_URL)),
     );
     return;
   }
