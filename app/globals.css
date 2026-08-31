@@ -1727,3 +1727,290 @@ textarea:focus-visible {
   .theme-dots .day-dot.orbit-near::before,
   .theme-dots .day-dot.orbit-mid::before { animation: none; }
 }
+
+
+/* One-screen year view and keyboard-aware editor */
+.phone-canvas.view-year {
+  height: 100svh;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-top: max(14px, env(safe-area-inset-top));
+  padding-bottom: calc(74px + env(safe-area-inset-bottom));
+}
+
+.view-year .topbar {
+  flex: 0 0 auto;
+  margin-bottom: clamp(8px, 1.6svh, 14px);
+}
+
+.view-year .view-stack {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto auto;
+  gap: clamp(6px, 1svh, 10px);
+  overflow: hidden;
+}
+
+.view-year .year-card {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(13px, 1.9svh, 18px) 18px 12px;
+  border-radius: 26px;
+}
+
+.view-year .year-summary {
+  flex: 0 0 auto;
+}
+
+.view-year .year-summary h1 {
+  font-size: clamp(2.35rem, 6.4svh, 3.2rem);
+}
+
+.view-year .meadow {
+  flex: 1;
+  min-height: 118px;
+  grid-template-rows: repeat(20, minmax(0, 1fr));
+  gap: 1px 4px;
+  margin: clamp(8px, 1.4svh, 13px) 0 clamp(6px, 1svh, 10px);
+}
+
+.view-year .day-dot {
+  min-height: 0;
+  aspect-ratio: auto;
+}
+
+.theme-dots .view-year .day-dot::before {
+  inset: auto;
+  top: 50%;
+  left: 50%;
+  width: 13px;
+  height: 13px;
+  transform: translate(-50%, -50%) scale(var(--day-scale));
+}
+
+.theme-dots .view-year .day-dot.favorite::after {
+  inset: auto;
+  top: 50%;
+  left: 50%;
+  width: 13px;
+  height: 13px;
+  transform: translate(-50%, -50%);
+}
+
+.theme-dots .view-year .day-dot:hover::before,
+.theme-dots .view-year .day-dot.is-hovered::before {
+  transform: translate(-50%, -50%) scale(1.05);
+}
+
+.theme-dots .view-year .day-dot:active::before {
+  transform: translate(-50%, -50%) scale(0.9);
+}
+
+.theme-dots .view-year .day-dot.orbit-near:not(.is-hovered)::before {
+  animation-name: compact-dot-orbit-near;
+}
+
+.theme-dots .view-year .day-dot.orbit-mid:not(.is-hovered)::before {
+  animation-name: compact-dot-orbit-mid;
+}
+
+.view-year .progress-copy {
+  flex: 0 0 auto;
+  font-size: 0.68rem;
+}
+
+.view-year .journal-card {
+  margin: 0;
+  padding: clamp(11px, 1.6svh, 15px);
+  border-radius: 22px;
+}
+
+.view-year .journal-heading {
+  gap: 9px;
+}
+
+.view-year .today-flower {
+  width: 40px;
+  height: 40px;
+  border-radius: 13px;
+  font-size: 1.3rem;
+}
+
+.view-year .journal-heading h2 {
+  font-size: clamp(1.03rem, 2.35svh, 1.22rem);
+  line-height: 1.08;
+}
+
+.view-year .journal-prompt,
+.view-year .saved-preview {
+  max-height: 2.7em;
+  margin: clamp(7px, 1svh, 11px) 2px;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  -webkit-line-clamp: 2;
+}
+
+.view-year .primary-button {
+  min-height: 43px;
+}
+
+.view-year .memory-count {
+  margin: 0;
+  font-size: 0.69rem;
+}
+
+.streak-pill {
+  flex: 0 0 auto;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  padding: 5px 9px;
+  border: 1px solid rgb(149 118 173 / 18%);
+  border-radius: 14px;
+  color: #696987;
+  background: linear-gradient(145deg, rgb(240 236 248 / 92%), rgb(238 244 249 / 92%));
+}
+
+.streak-pill > span:first-child {
+  color: #9678aa;
+  font-size: 0.78rem;
+}
+
+.streak-pill > span:last-child {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: baseline;
+  column-gap: 3px;
+  font-size: 0.65rem;
+  font-weight: 750;
+  line-height: 1;
+}
+
+.streak-pill strong {
+  color: #596d94;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.streak-pill small {
+  grid-column: 1 / -1;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 0.52rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.view-year .month-explorer {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+}
+
+.view-year .month-heading {
+  flex: 0 0 auto;
+  margin-bottom: 7px;
+}
+
+.view-year .month-heading button {
+  width: 38px;
+  height: 38px;
+}
+
+.view-year .month-weekdays {
+  flex: 0 0 auto;
+}
+
+.view-year .month-grid {
+  flex: 1;
+  min-height: 0;
+  grid-template-rows: repeat(6, minmax(0, 1fr));
+}
+
+.view-year .month-day,
+.view-year .month-blank {
+  min-height: 0;
+}
+
+.view-year .month-dot {
+  width: clamp(14px, 2.4svh, 20px);
+  height: clamp(14px, 2.4svh, 20px);
+}
+
+.editor-backdrop {
+  overscroll-behavior: none;
+}
+
+.editor-sheet {
+  max-height: calc(100% - 4px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.editor-backdrop.keyboard-open {
+  padding: 6px 10px max(6px, env(safe-area-inset-bottom));
+}
+
+.keyboard-open .editor-sheet {
+  padding: 7px 16px 12px;
+  border-radius: 24px;
+}
+
+.keyboard-open .sheet-handle {
+  margin-bottom: 8px;
+}
+
+.keyboard-open .memory-editor {
+  margin-top: 10px;
+}
+
+.keyboard-open .memory-editor textarea {
+  height: clamp(104px, calc(var(--editor-viewport-height) - 226px), 148px);
+  min-height: 104px;
+  resize: none;
+}
+
+.keyboard-open .draft-status {
+  margin-top: 4px;
+}
+
+.keyboard-open .editor-actions {
+  margin-top: 8px;
+}
+
+@keyframes compact-dot-orbit-near {
+  0%, 100% { transform: translate(-50%, -50%) translate3d(0, 0, 0) scale(var(--day-scale)); }
+  28% { transform: translate(-50%, -50%) translate3d(1.35px, -0.85px, 0) scale(var(--day-scale)); }
+  62% { transform: translate(-50%, -50%) translate3d(-1.15px, 0.75px, 0) scale(var(--day-scale)); }
+}
+
+@keyframes compact-dot-orbit-mid {
+  0%, 100% { transform: translate(-50%, -50%) translate3d(0, 0, 0) scale(var(--day-scale)); }
+  35% { transform: translate(-50%, -50%) translate3d(0.65px, -0.45px, 0) scale(var(--day-scale)); }
+  70% { transform: translate(-50%, -50%) translate3d(-0.55px, 0.35px, 0) scale(var(--day-scale)); }
+}
+
+@media (max-height: 700px) {
+  .view-year .topbar { margin-bottom: 6px; }
+  .view-year .journal-card { padding: 10px 12px; }
+  .view-year .journal-prompt,
+  .view-year .saved-preview { display: none; }
+  .view-year .primary-button { min-height: 41px; margin-top: 8px; }
+  .view-year .memory-count { display: none; }
+}
+
+@media (min-width: 620px) {
+  .phone-canvas.view-year {
+    height: calc(100svh - 56px);
+  }
+}

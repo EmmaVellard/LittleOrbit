@@ -1,4 +1,4 @@
-const CACHE_NAME = 'little-orbit-v17';
+const CACHE_NAME = 'little-orbit-v18';
 const APP_BASE_URL = new URL('./', self.location.href);
 const scopedUrl = (path) => new URL(path, APP_BASE_URL).toString();
 const HOME_URL = scopedUrl('.');

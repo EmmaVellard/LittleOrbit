@@ -134,6 +134,21 @@ function keyForDay(year: number, day: number) {
   return localDateKey(new Date(year, 0, day, 12));
 }
 
+function calculateCurrentStreak(entries: JournalEntry[], todayKey: string) {
+  const recordedDates = new Set(entries.map((entry) => entry.date));
+  const cursor = dateFromKey(todayKey);
+
+  // Keep yesterday's streak alive until there has been a chance to write today.
+  if (!recordedDates.has(todayKey)) cursor.setDate(cursor.getDate() - 1);
+
+  let streak = 0;
+  while (recordedDates.has(localDateKey(cursor))) {
+    streak += 1;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+  return streak;
+}
+
 function parseMarkdownBackup(markdown: string): JournalEntry[] {
   const entries: JournalEntry[] = [];
   const pattern = /<!--\s*little-orbit-entry:(\d{4}-\d{2}-\d{2})(?:\s+favorite:(true|false))?\s*-->\s*\n([\s\S]*?)\n\s*<!--\s*\/little-orbit-entry\s*-->/g;
@@ -171,6 +186,11 @@ export default function JournalApp() {
   const [notice, setNotice] = useState('');
   const [hoveredDate, setHoveredDate] = useState<string | null>(null);
   const [dotSeed, setDotSeed] = useState(20_260_828);
+  const [editorViewport, setEditorViewport] = useState({
+    height: '100dvh',
+    top: '0px',
+    keyboardOpen: false,
+  });
   const importRef = useRef<HTMLInputElement>(null);
   const touchMovedRef = useRef(false);
   const memoryOpenTimerRef = useRef<number | null>(null);
@@ -217,6 +237,34 @@ export default function JournalApp() {
     return () => window.clearTimeout(timer);
   }, [notice]);
 
+  useEffect(() => {
+    if (!editorDate) return;
+
+    const viewport = window.visualViewport;
+    const syncViewport = () => {
+      const height = viewport?.height ?? window.innerHeight;
+      const top = viewport?.offsetTop ?? 0;
+      setEditorViewport({
+        height: `${Math.round(height)}px`,
+        top: `${Math.round(top)}px`,
+        keyboardOpen: height < window.innerHeight - 96,
+      });
+    };
+    const resizeTarget = viewport ?? window;
+    const previousOverflow = document.body.style.overflow;
+
+    syncViewport();
+    document.body.style.overflow = 'hidden';
+    resizeTarget.addEventListener('resize', syncViewport);
+    viewport?.addEventListener('scroll', syncViewport);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      resizeTarget.removeEventListener('resize', syncViewport);
+      viewport?.removeEventListener('scroll', syncViewport);
+    };
+  }, [editorDate]);
+
 
   const entryMap = useMemo(
     () => new Map(entries.map((entry) => [entry.date, entry])),
@@ -249,6 +297,11 @@ export default function JournalApp() {
   const yearEntries = useMemo(
     () => entries.filter((entry) => entry.date.startsWith(`${year}-`)),
     [entries, year],
+  );
+
+  const currentStreak = useMemo(
+    () => calculateCurrentStreak(entries, todayKey),
+    [entries, todayKey],
   );
 
   const filteredEntries = useMemo(() => {
@@ -460,7 +513,7 @@ export default function JournalApp() {
 
   return (
     <main className="app-shell theme-dots" aria-busy={!dateReady} style={{ visibility: dateReady ? 'visible' : 'hidden' }}>
-      <section className="phone-canvas" aria-label="Little Orbit journal">
+      <section className={`phone-canvas view-${view}`} aria-label="Little Orbit journal">
         <header className="topbar">
           <button className="brand-button" type="button" onClick={() => setView('year')} aria-label="Go to year view">
             <span className="eyebrow">{view === 'year' ? 'My year among the stars' : view === 'memories' ? 'My collection' : 'Make it mine'}</span>
@@ -602,6 +655,10 @@ export default function JournalApp() {
                     {entryMap.has(todayKey) ? 'Today is safely tucked away.' : 'What made today mine?'}
                   </h2>
                 </div>
+                <div className="streak-pill" aria-label={`${currentStreak} ${currentStreak === 1 ? 'day' : 'days'} in my current streak`}>
+                  <span aria-hidden="true">✦</span>
+                  <span><strong>{ready ? currentStreak : '–'}</strong> {currentStreak === 1 ? 'day' : 'days'}<small>streak</small></span>
+                </div>
               </div>
               {entryMap.has(todayKey) ? (
                 <p className="saved-preview">“{entryMap.get(todayKey)?.text}”</p>
@@ -720,7 +777,17 @@ export default function JournalApp() {
       </section>
 
       {editorDate && (
-        <div className="editor-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && closeEditor()}>
+        <div
+          className={`editor-backdrop ${editorViewport.keyboardOpen ? 'keyboard-open' : ''}`}
+          role="presentation"
+          style={{
+            '--editor-viewport-height': editorViewport.height,
+            height: editorViewport.height,
+            top: editorViewport.top,
+            bottom: 'auto',
+          } as CSSProperties}
+          onMouseDown={(event) => event.target === event.currentTarget && closeEditor()}
+        >
           <section className="editor-sheet" role="dialog" aria-modal="true" aria-labelledby="editor-heading">
             <div className="sheet-handle" aria-hidden="true" />
             <div className="editor-topline">
