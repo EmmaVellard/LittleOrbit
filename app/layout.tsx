@@ -10,6 +10,7 @@ export const metadata: Metadata = {
   manifest: `${basePath}/manifest.webmanifest`,
   icons: {
     icon: [
+      { url: `${basePath}/favicon.svg`, type: 'image/svg+xml' },
       { url: `${basePath}/icon-192.png`, sizes: '192x192', type: 'image/png' },
       { url: `${basePath}/icon-512.png`, sizes: '512x512', type: 'image/png' },
     ],
