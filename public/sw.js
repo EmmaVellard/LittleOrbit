@@ -1,10 +1,12 @@
-const CACHE_NAME = 'little-orbit-v18';
+const CACHE_NAME = 'little-orbit-v19';
 const APP_BASE_URL = new URL('./', self.location.href);
 const scopedUrl = (path) => new URL(path, APP_BASE_URL).toString();
 const HOME_URL = scopedUrl('.');
 const APP_SHELL = [
   HOME_URL,
   scopedUrl('manifest.webmanifest'),
+  scopedUrl('favicon.svg'),
+  scopedUrl('apple-touch-icon.png'),
   scopedUrl('icon-192.png'),
   scopedUrl('icon-512.png'),
 ];

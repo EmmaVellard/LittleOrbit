@@ -9,6 +9,7 @@
     "dev": "vinext dev",
     "build": "vinext build",
     "build:pages": "LITTLE_ORBIT_GITHUB_PAGES=true next build",
+    "icons": "node scripts/generate-app-icons.mjs",
     "start": "vinext start",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"
   },
